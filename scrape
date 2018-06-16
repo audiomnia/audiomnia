@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TARGET_FILE=client/data/"$1".geojson
+
+echo $TARGET_FILE
+
+echo '; var macaulayMedia = { "type": "FeatureCollection", "features": ' > "$TARGET_FILE"
+scrapy crawl "$1" -o "$TARGET_FILE" -t json
+echo '};' >> "$TARGET_FILE"
