@@ -51,7 +51,10 @@ class MacaulayLibrarySpider(scrapy.Spider):
         json_ld_element = soup.find('script', {'type':'application/ld+json'})
 
         json_ld = json.loads(json_ld_element.text)
-        geo = json_ld["geo"]
+
+        geo = json_ld.pop("geo")
+        json_ld.pop("@type")
+        # json_ld.pop("@content")
 
         yield Feature(
             geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),

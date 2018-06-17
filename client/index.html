@@ -17,7 +17,8 @@
     </style>
 
     <script src="https://openlayers.org/en/v4.6.5/build/ol-debug.js" type="text/javascript"></script>
-    <script src="/data/macaulaylibrary.geojson"></script>
+    <script src="./js/querystring.min.js"></script>
+    <script src="./data/macaulaylibrary.geojson"></script>
 
     <title>Audiomnia</title>
   </head>
@@ -25,13 +26,59 @@
 
     <div id="map" class="map"></div>
 
+    Cluster Distance: <input id="distance" type="range" min="0" max="100" step="1" value="40"/>
+
+    Filter by Creator: <select multiple id="filterByCreator"></select>
+
     <script type="text/javascript">
-      function initMap() {
-        var image = new ol.style.Circle({
-          radius: 3,
-          fill: new ol.style.Fill({ color: "white" }),
-          stroke: new ol.style.Stroke({color: 'darkblue', width: 1})
+      var select = document.getElementById("filterByCreator"); 
+      var mapDiv = document.getElementById('map');
+      var distance = document.getElementById('distance');
+  
+      function renderMap(params) {
+        console.log("Rendermap");
+        var qs = querystring.parse();
+        
+        mapDiv.innerHTML = "";
+
+        var vectorSource = new ol.source.Vector({
+          features: (new ol.format.GeoJSON({
+            featureProjection: 'EPSG:3857'  
+          })).readFeatures(macaulayMedia),
         });
+
+        var clusterSource = new ol.source.Cluster({
+          distance: parseInt(distance.value, 10),
+          source: vectorSource
+        });
+
+
+        var styleCache = {};
+        function clusterStyle(feature) {
+          var size = feature.get('features').length;
+          var style = styleCache[size];
+          if (!style) {
+            style = new ol.style.Style({
+              image: new ol.style.Circle({
+                radius: 10,
+                stroke: new ol.style.Stroke({
+                  color: '#fff'
+                }),
+                fill: new ol.style.Fill({
+                  color: '#3399CC'
+                })
+              }),
+              text: new ol.style.Text({
+                text: size.toString(),
+                fill: new ol.style.Fill({
+                  color: '#fff'
+                })
+              })
+            });
+            styleCache[size] = style;
+          }
+          return style;
+        }
 
         var map = new ol.Map({
           layers: [
@@ -39,25 +86,54 @@
               source: new ol.source.OSM()
             }),
             new ol.layer.Vector({
-              source: new ol.source.Vector({
-                features: (new ol.format.GeoJSON({
-                  featureProjection: 'EPSG:3857'  
-                })).readFeatures(macaulayMedia),
-              }),
-              style: new ol.style.Style({
-                image: image
-              }),
+              source: clusterSource,
+              style: clusterStyle,
             })
           ],
           target: document.getElementById('map'),
           view: new ol.View({
             center: [0, 0],
-            zoom: 3
+            zoom: 1
           })
         });
+
+        distance.addEventListener('input', function() {
+          clusterSource.setDistance(parseInt(distance.value, 10));
+        });
+
+        select.innerHTML = "";
+        macaulayMedia.features
+          .map((f) => f.properties.creator)
+          .reduce(function(p, c) { if (p.indexOf(c) < 0) p.push(c); return p; }, [])
+          .sort()
+          .map((c) => {
+            var el = document.createElement("option");
+            el.textContent = c;
+            el.value = c;
+            if(qs.creator && qs.creator.indexOf(c) > -1) {
+              el.selected = "selected";
+            }
+            select.appendChild(el);
+          });
+
+          // Events
+          select.addEventListener('change', function(e) {
+            var qs = querystring.parse()
+            qs.creator = [];
+
+            for (var i = 0; i < this.length; i++) {
+                if (this.options[i].selected) {
+                  qs.creator.push(this.options[i].value);
+                }
+            }
+
+            history.pushState({}, '', "?" + querystring.stringify(qs))
+            window.dispatchEvent(new Event("popstate"));
+          });
       }
 
-      window.onload = initMap;
+      renderMap();
+      window.onpopstate = renderMap;
     </script>
   </body>
 </html>

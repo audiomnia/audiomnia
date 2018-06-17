@@ -1,9 +1,22 @@
 #!/bin/bash
 
 TARGET_FILE=client/data/"$1".geojson
+SCRAPERS=["macalaylibrary"]
 
-echo $TARGET_FILE
+if [ $# -eq 0 ]
+  then
+    for scraper in scrapers; do
+		echo "scrape all"
+	done
+else
+	# Write Headers
+	# TODO: See if there's a scrapy-sanctioned way to do this
+	echo '; var macaulayMedia = { "type": "FeatureCollection", "features": ' \
+		 > "$TARGET_FILE"
 
-echo '; var macaulayMedia = { "type": "FeatureCollection", "features": ' > "$TARGET_FILE"
-scrapy crawl "$1" -o "$TARGET_FILE" -t json
-echo '};' >> "$TARGET_FILE"
+	# Scrape scrape scrape
+	scrapy crawl "$1" -o "$TARGET_FILE" -t json
+
+	# Close JSON object
+	echo '};' >> "$TARGET_FILE"
+fi
