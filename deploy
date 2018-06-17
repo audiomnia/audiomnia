@@ -1,0 +1,14 @@
+IPFS_HASH=`ipfs add -r client | tail -1 | cut -d ' ' -f2`
+ipfs daemon &
+sleep 2
+
+ipfs swarm connect /ip4/18.204.178.7/tcp/4001/ipfs/QmSRJJjG1KhwGhLpkkm826u7qreN4Qy1deBwZDqz9gj8bU
+
+ssh -t ubuntu@mrh.io \
+	-i /keybase/private/aphelionz/mrh-ipfs.pem \
+	"su -c 'ipfs get $IPFS_HASH'; su -c 'ipfs pin add --recursive $IPFS_HASH'"
+
+wget http://18.204.178.7/ipfs/"$IPFS_HASH"
+rm -f $IPFS_HASH
+
+killall ipfs
