@@ -4,7 +4,6 @@ import json
 from lxml import etree, html
 import sys
 
-from bs4 import BeautifulSoup
 from geojson import Point, Feature
 import scrapy
 
