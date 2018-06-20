@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from lxml import etree
+from lxml import etree, html
 import sys
 
 from bs4 import BeautifulSoup
@@ -42,21 +42,32 @@ class MacaulayLibrarySpider(scrapy.Spider):
         urls = [child.text for child in children]
         
         for url in urls:
+
             yield scrapy.Request(url, callback=self.parse_media_page)
 
-    # Step 3
+    # Step 3:
     # Get JSON-LD schema.org metadata from each individual page (187,000+ pages)
     def parse_media_page(self, response):
-        soup = BeautifulSoup(response.body, "lxml")
-        json_ld_element = soup.find('script', {'type':'application/ld+json'})
-
+        h = html.fromstring(response.body)
+        json_ld_element = h.cssselect("script[type='application/ld+json']")[0]
         json_ld = json.loads(json_ld_element.text)
 
+        # Only capture resources that have valid geo-coordinates
         geo = json_ld.pop("geo")
-        json_ld.pop("@type")
-        # json_ld.pop("@content")
+        longitude = geo["longitude"]
+        latitude = geo["latitude"]
+        if(longitude == "" or latitude == ""): pass
 
-        yield Feature(
-            geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),
-            properties=json_ld
-        )
+        json_ld["commonName"] = h.cssselect(".SpecimenHeader-commonName span")[0].text
+        json_ld["sciName"] = h.cssselect(".SpecimenHeader-sciName")[0].text
+        
+        json_ld.pop("@type")
+        json_ld.pop("@context")
+
+        try:
+            yield Feature(
+                geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),
+                properties=json_ld
+            )
+        except ValueError as e:
+            assert False, geo

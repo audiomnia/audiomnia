@@ -11,12 +11,8 @@ if [ $# -eq 0 ]
 else
 	# Write Headers
 	# TODO: See if there's a scrapy-sanctioned way to do this
-	echo '; var macaulayMedia = { "type": "FeatureCollection", "features": ' \
-		 > "$TARGET_FILE"
+	echo '; var macaulayMedia = ' > "$TARGET_FILE"
 
 	# Scrape scrape scrape
 	scrapy crawl "$1" -o "$TARGET_FILE" -t json
-
-	# Close JSON object
-	echo '};' >> "$TARGET_FILE"
 fi
