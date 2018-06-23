@@ -1,10 +1,12 @@
 asn1crypto==0.24.0
 attrs==18.1.0
 Automat==0.7.0
+certifi==2018.4.16
 cffi==1.11.5
 constantly==15.1.0
 cryptography==2.2.2
 cssselect==1.0.3
+elasticsearch==6.3.0
 geojson==2.4.0
 hyperlink==18.0.0
 idna==2.7
@@ -22,5 +24,6 @@ Scrapy==1.5.0
 service-identity==17.0.0
 six==1.11.0
 Twisted==18.4.0
+urllib3==1.23
 w3lib==1.19.0
 zope.interface==4.5.0
