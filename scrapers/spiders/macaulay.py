@@ -2,11 +2,18 @@
 
 import json
 from lxml import etree, html
+import os
 import sys
 
 from geojson import Point, Feature
 import scrapy
 
+from elasticsearch import Elasticsearch
+
+ES_USER = os.environ.get("ES_USER")
+ES_PASS = os.environ.get("ES_PASS")
+es = Elasticsearch(['https://{}:{}@es.mrh.io:443'.format(ES_USER, ES_PASS)])
+if es.ping() is not True: sys.exit()
 
 class MacaulayLibrarySpider(scrapy.Spider):
     name = 'macaulaylibrary'
@@ -15,6 +22,7 @@ class MacaulayLibrarySpider(scrapy.Spider):
 
     URLTAG = "{http://www.sitemaps.org/schemas/sitemap/0.9}url"
     LOCTAG = "{http://www.sitemaps.org/schemas/sitemap/0.9}log"
+
 
     # Step 1:
     # Get urls from http://macaulaylibrary.org/sitemap.xml
@@ -46,6 +54,9 @@ class MacaulayLibrarySpider(scrapy.Spider):
 
     # Step 3:
     # Get JSON-LD schema.org metadata from each individual page (187,000+ pages)
+    #
+    # TODO: Write response.
+    #
     def parse_media_page(self, response):
         h = html.fromstring(response.body)
         json_ld_element = h.cssselect("script[type='application/ld+json']")[0]
@@ -64,6 +75,7 @@ class MacaulayLibrarySpider(scrapy.Spider):
         json_ld.pop("@context")
 
         try:
+            es.index(index="audiomnia-dev", doc_type='media', body=json_ld)
             yield Feature(
                 geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),
                 properties=json_ld
