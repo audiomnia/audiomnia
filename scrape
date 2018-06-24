@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TARGET_FILE=client/data/"$1".geojson
+TARGET_FILE="$1".jl
 SCRAPERS=["macalaylibrary"]
 
 if [ $# -eq 0 ]
@@ -9,6 +9,7 @@ if [ $# -eq 0 ]
 		echo "scrape all"
 	done
 else
+	rm TARGET_FILE
 	# Scrape scrape scrape
-	scrapy crawl "$1" -o "$TARGET_FILE" -t json
+	scrapy crawl "$1" -o "$TARGET_FILE" -t jl
 fi

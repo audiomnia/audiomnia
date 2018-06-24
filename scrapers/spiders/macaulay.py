@@ -5,15 +5,7 @@ from lxml import etree, html
 import os
 import sys
 
-from geojson import Point, Feature
 import scrapy
-
-from elasticsearch import Elasticsearch
-
-ES_USER = os.environ.get("ES_USER")
-ES_PASS = os.environ.get("ES_PASS")
-es = Elasticsearch(['https://{}:{}@es.mrh.io:443'.format(ES_USER, ES_PASS)])
-if es.ping() is not True: sys.exit()
 
 
 class MacaulayLibrarySpider(scrapy.Spider):
@@ -50,7 +42,6 @@ class MacaulayLibrarySpider(scrapy.Spider):
         urls = [child.text for child in children]
         
         for url in urls:
-
             yield scrapy.Request(url, callback=self.parse_media_page)
 
     # Step 3:
@@ -67,21 +58,15 @@ class MacaulayLibrarySpider(scrapy.Spider):
         json_ld["commonName"] = h.cssselect(".SpecimenHeader-commonName span")[0].text
         json_ld["sciName"] = h.cssselect(".SpecimenHeader-sciName")[0].text
         
-        # Tidy up
+        # Handle geospatial stuff
         geo = json_ld.pop("geo")
         json_ld["geo"] = {
-            "lat": geo["latitude"],
-            "lon": geo["longitude"]
+            "lat": geo.get("latitude", ""),
+            "lon": geo.get("longitude", "")
         }
        
         # Remove any schema.org stuff that's left
         json_ld.pop("@type")
         json_ld.pop("@context")
 
-        es.index(index="audiomnia-dev", doc_type='media', body=json_ld)
-        if(geo["longitude"] == "" or geo["latitude"] == ""): pass
-
-        yield Feature(
-            geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),
-            properties=json_ld
-        )
+        yield json_ld
