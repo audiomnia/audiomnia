@@ -70,7 +70,7 @@ class MacaulayLibrarySpider(scrapy.Spider):
         # Tidy up
         geo = json_ld.pop("geo")
         json_ld["geo"] = {
-            "lat": geo["latitude"]
+            "lat": geo["latitude"],
             "lon": geo["longitude"]
         }
        
