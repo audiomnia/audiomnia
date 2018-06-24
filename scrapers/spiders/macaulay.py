@@ -67,6 +67,8 @@ class MacaulayLibrarySpider(scrapy.Spider):
         json_ld["commonName"] = h.cssselect(".SpecimenHeader-commonName span")[0].text
         json_ld["sciName"] = h.cssselect(".SpecimenHeader-sciName")[0].text
         
+        # Tidy up schema.org stuff
+        json_ld['geo'].pop("@type")
         json_ld.pop("@type")
         json_ld.pop("@context")
 
