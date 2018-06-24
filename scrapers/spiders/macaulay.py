@@ -67,22 +67,21 @@ class MacaulayLibrarySpider(scrapy.Spider):
         json_ld["commonName"] = h.cssselect(".SpecimenHeader-commonName span")[0].text
         json_ld["sciName"] = h.cssselect(".SpecimenHeader-sciName")[0].text
         
-        # Tidy up schema.org stuff
-        json_ld['geo'].pop("@type")
+        # Tidy up
+        geo = json_ld.pop("geo")
+        json_ld["geo"] = {
+            "lat": geo["latitude"]
+            "lon": geo["longitude"]
+        }
+       
+        # Remove any schema.org stuff that's left
         json_ld.pop("@type")
         json_ld.pop("@context")
 
-        try:
-            es.index(index="audiomnia-dev", doc_type='media', body=json_ld)
+        es.index(index="audiomnia-dev", doc_type='media', body=json_ld)
+        if(geo["longitude"] == "" or geo["latitude"] == ""): pass
 
-            geo = json_ld.pop("geo")
-            longitude = geo["longitude"]
-            latitude = geo["latitude"]
-            if(longitude == "" or latitude == ""): pass
-
-            yield Feature(
-                geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),
-                properties=json_ld
-            )
-        except ValueError as e:
-            assert False, geo
+        yield Feature(
+            geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),
+            properties=json_ld
+        )
