@@ -15,6 +15,7 @@ ES_PASS = os.environ.get("ES_PASS")
 es = Elasticsearch(['https://{}:{}@es.mrh.io:443'.format(ES_USER, ES_PASS)])
 if es.ping() is not True: sys.exit()
 
+
 class MacaulayLibrarySpider(scrapy.Spider):
     name = 'macaulaylibrary'
     allowed_domains = ['macaulaylibrary.org']
@@ -63,11 +64,6 @@ class MacaulayLibrarySpider(scrapy.Spider):
         json_ld = json.loads(json_ld_element.text)
 
         # Only capture resources that have valid geo-coordinates
-        geo = json_ld.pop("geo")
-        longitude = geo["longitude"]
-        latitude = geo["latitude"]
-        if(longitude == "" or latitude == ""): pass
-
         json_ld["commonName"] = h.cssselect(".SpecimenHeader-commonName span")[0].text
         json_ld["sciName"] = h.cssselect(".SpecimenHeader-sciName")[0].text
         
@@ -76,6 +72,12 @@ class MacaulayLibrarySpider(scrapy.Spider):
 
         try:
             es.index(index="audiomnia-dev", doc_type='media', body=json_ld)
+
+            geo = json_ld.pop("geo")
+            longitude = geo["longitude"]
+            latitude = geo["latitude"]
+            if(longitude == "" or latitude == ""): pass
+
             yield Feature(
                 geometry=Point([float(geo["longitude"]), float(geo["latitude"])]),
                 properties=json_ld
