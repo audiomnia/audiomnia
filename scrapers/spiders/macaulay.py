@@ -69,9 +69,4 @@ class MacaulayLibrarySpider(scrapy.Spider):
         json_ld.pop("@type")
         json_ld.pop("@context")
 
-        yield { "index" : {
-            "_index" : "audiomnia_dev",
-            "_type" : "media",
-            "_id" : json_ld["url"] }
-        }
         yield json_ld

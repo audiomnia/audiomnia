@@ -9,7 +9,7 @@ if [ $# -eq 0 ]
 		echo "scrape all"
 	done
 else
-	rm TARGET_FILE
+	rm "$TARGET_FILE"
 	# Scrape scrape scrape
 	scrapy crawl "$1" -o "$TARGET_FILE" -t jl
 fi
