@@ -20,7 +20,7 @@ class MacaulaylibraryPipeline(object):
             "_index" : "audiomnia_dev",
             "_type" : "media",
             "_id" : item["url"] }
-        })
+        }) + "\n"
         line = json.dumps(dict(item)) + "\n"
 
         self.file.write(bulk_command)
