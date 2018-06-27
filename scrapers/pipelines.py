@@ -6,7 +6,10 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 import json
+from datetime import datetime
 
+AUDIOMNIA_VERSION="dev"
+DATE = datetime.now().strftime("%Y-%m-%d")
 
 class MacaulaylibraryPipeline(object):
     def open_spider(self, spider):
@@ -17,7 +20,7 @@ class MacaulaylibraryPipeline(object):
 
     def process_item(self, item, spider):
         bulk_command = json.dumps({ "index" : {
-            "_index" : "audiomnia-dev",
+            "_index" : "audiomnia-{}-{}".format(AUDIOMNIA_VERSION, DATE),
             "_type" : "media",
             "_id" : item["url"] }
         }) + "\n"
