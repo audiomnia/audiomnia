@@ -17,7 +17,7 @@ class MacaulaylibraryPipeline(object):
 
     def process_item(self, item, spider):
         bulk_command = json.dumps({ "index" : {
-            "_index" : "audiomnia_dev",
+            "_index" : "audiomnia-dev",
             "_type" : "media",
             "_id" : item["url"] }
         }) + "\n"
