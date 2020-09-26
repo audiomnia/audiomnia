@@ -1,0 +1,24 @@
+{
+  "name": "audiomnia",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hackforthesea/audiomnia.git"
+  },
+  "keywords": [],
+  "author": "Mark Henderson",
+  "license": "GPL-3",
+  "bugs": {
+    "url": "https://github.com/hackforthesea/audiomnia/issues"
+  },
+  "homepage": "https://audiomnia.com",
+  "devDependencies": {
+    "mocha": "^8.1.3",
+    "orbit-db-test-utils": "^0.12.1"
+  }
+}
