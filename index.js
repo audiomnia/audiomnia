@@ -23,7 +23,7 @@ const parseJsonLines = (orbitdb) => {
 
         await db.put(item)
         itemCount--
-        console.log(`Added: ${item.url}, ${itemCount} left`)
+        process.stdout.write(`Added: ${item.url}, ${itemCount} left\r`)
 
         if(itemCount === 0) {
           resolve(orbitdb)
