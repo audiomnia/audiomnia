@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "live-server --ignore=node_modules/** --no-css-inject --no-browser .",
     "test": "mocha"
   },
   "repository": {
