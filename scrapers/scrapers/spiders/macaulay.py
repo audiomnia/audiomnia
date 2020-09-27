@@ -33,24 +33,15 @@ class MacaulayLibrarySpider(scrapy.Spider):
     # untested derivation of the media URL.
     def parse_media_page(self, response):
         h = html.fromstring(response.body)
-        json_ld_element = h.cssselect("script[type='application/ld+json']")[0]
-        json_ld = json.loads(json_ld_element.text)
+        json_ld = h.cssselect("script[type='application/ld+json']")[0]
+        item = json.loads(json_ld.text)
 
         # Only capture resources that have valid geo-coordinates
         # json_ld["commonName"] = h.cssselect(".SpecimenHeader-commonName span")[0].text
         # json_ld["sciName"] = h.cssselect(".SpecimenHeader-sciName")[0].text
 
         # Handle geospatial stuff
-        geo = json_ld.pop("geo")
-        json_ld["geo"] = {
-            "lat": geo.get("latitude", ""),
-            "lon": geo.get("longitude", "")
-        }
+        # TODO: validate these somehow
+        item["likely_media_url"] = item["url"].replace("https://macaulaylibrary.org/asset/", "https://cdn.download.ams.birds.cornell.edu/api/v1/asset/")
 
-        # Remove any schema.org stuff that's left
-        json_ld.pop("@type")
-        json_ld.pop("@context")
-
-        json_ld["likely_media_url"] = json_ld["url"].replace("https://macaulaylibrary.org/asset/", "https://cdn.download.ams.birds.cornell.edu/api/v1/asset/")
-
-        yield json_ld
+        yield item

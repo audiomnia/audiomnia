@@ -1,30 +1,33 @@
 # -*- coding: utf-8 -*-
 
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-
-import json
-import os
-from datetime import datetime
+from scrapers.exporters import GeoJsonItemExporter
 
 
-class MacaulaylibraryPipeline(object):
+class GeoJSONPipeline(object):
     def open_spider(self, spider):
-        self.file = open('items.jl', 'w')
-
-    def close_spider(self, spider):
-        self.file.close()
+        file_path = '../data/{}.geojson'.format(spider.name)
+        self.file = open(file_path, 'wb')
+        self.exporter = GeoJsonItemExporter(self.file)
+        self.exporter.start_exporting()
 
     def process_item(self, item, spider):
-        bulk_command = json.dumps({ "index" : {
-            "_index" : os.environ.get("ES_INDEX", "audiomnia-dev"),
-            "_type" : "media",
-            "_id" : item["url"] }
-        }) + "\n"
-        line = json.dumps(dict(item)) + "\n"
+        geojson = {}
+        geo = item.pop("geo")
 
-        self.file.write(bulk_command)
-        self.file.write(line)
-        return item
+        # TODO: Validate media URLs here
+        geojson["type"] = "Feature"
+        geojson["geometry"] = {
+            "type": "Point",
+            "coordinates": [
+                geo.get("longitude", ""),
+                geo.get("latitude", "")
+            ]
+        }
+        geojson["properties"] = item
+
+        self.exporter.export_item(geojson)
+        return geojson
+
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
