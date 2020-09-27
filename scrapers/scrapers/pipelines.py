@@ -13,19 +13,23 @@ class GeoJSONPipeline(object):
     def process_item(self, item, spider):
         geojson = {}
         geo = item.pop("geo")
+        longitude = geo.get("longitude", None)
+        latitude = geo.get("latitude", None)
+
+        if not longitude or not latitude:
+            return None
 
         # TODO: Validate media URLs here
+        # TODO: Backup geolocation by municipality
         geojson["type"] = "Feature"
         geojson["geometry"] = {
             "type": "Point",
-            "coordinates": [
-                geo.get("longitude", ""),
-                geo.get("latitude", "")
-            ]
+            "coordinates": [longitude, latitude]
         }
         geojson["properties"] = item
 
         self.exporter.export_item(geojson)
+
         return geojson
 
     def close_spider(self, spider):
