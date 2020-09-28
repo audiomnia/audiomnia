@@ -63,11 +63,8 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-12">
-          <div id="results">Click on the icons on the map</div>
-        </div>
-      </div>
+      <div class="row" id="results"></div>
+
       <footer style="margin-top: 1em">
         Source code available on <a href="https://github.com/hackforthesea/audiomnia">GitHub</a>.
       </footer>
@@ -84,22 +81,36 @@
 
       var mapDiv = document.getElementById('map');
 
-      function renderResults(feature) {
-        $("#results").html("");
+      async function renderResults(feature) {
         const props = feature.getProperties()
 
-        console.log(props)
+        const url = props.url
+        const img = props.image
+        const desc = props.description
+        const name = desc[1]
+        const sciName = desc[2]
+        const audio = props.audio
+        const libraryIdentifier = desc[0]
+        const copyright = desc[3]
+        const location = desc[4]
+        const datetime = desc[5]
 
-        const name = props.name;
-        const url = props.url;
-        const img = props.image;
-        const desc = props.description;
-        const audio = props.audio;
+        const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${name}`)
+        const image = (await res.json()).results[0].default_photo.medium_url
 
-        // $("#results").append(`<div><img src="${img}" alt="" /></div>`)
-        $("#results").append(`<audio controls><source src="${audio}"></audio>`)
-        $("#results").append(`<div><a href="${url}">${name}</a></div>`)
-        $("#results").append(`<div>${desc}</div>`)
+        let template = `<div class="col-md-4 card">`
+        template += `     <img class="card-img-top" src="${image}" alt="" />`
+        template += `     <div class="card-body">`
+        template += `       <div class="card-title"><a href="${url}">${name}<br /><small>(${sciName})</small></a></div>`
+        template += `       <audio controls><source src="${audio}"></audio>`
+        template += `       <div class="card-text">${libraryIdentifier}</div>`
+        template += `       <div class="card-text">${copyright}</div>`
+        template += `       <div class="card-text">${location}</div>`
+        template += `       <div class="card-text">${datetime}</div>`
+        template += `     </div>`
+        template += `   </div>`
+
+        $('#results').append(template)
       }
 
       function renderMap(params) {
@@ -132,10 +143,11 @@
         });
 
         map.addEventListener("click", function(e) {
-          this.forEachFeatureAtPixel(e.pixel, function(feature) {
-            if(feature.type == "VECTOR") return;
-            renderResults(feature);
-          })
+          const features = this.getFeaturesAtPixel(e.pixel)
+            .filter(f => !(f.type === "VECTOR"))
+
+          $("#results").html("");
+          Promise.all(features.map(renderResults));
         })
       }
 
