@@ -16,6 +16,9 @@ class GeoJSONPipeline(object):
         longitude = geo.get("longitude", None)
         latitude = geo.get("latitude", None)
 
+        description = item.pop("description", [])
+        description_split = description.split("; ")
+
         if not longitude or not latitude:
             return None
 
@@ -27,6 +30,7 @@ class GeoJSONPipeline(object):
             "coordinates": [longitude, latitude]
         }
         geojson["properties"] = item
+        geojson["properties"]["description"] = description_split
 
         self.exporter.export_item(geojson)
 
