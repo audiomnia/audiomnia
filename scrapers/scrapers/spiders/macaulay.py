@@ -41,6 +41,6 @@ class MacaulayLibrarySpider(scrapy.Spider):
 
         # Handle geospatial stuff
         # TODO: validate these somehow
-        item["likely_media_url"] = item["url"].replace("https://macaulaylibrary.org/asset/", "https://cdn.download.ams.birds.cornell.edu/api/v1/asset/")
+        item["audio"] = item["url"].replace("https://macaulaylibrary.org/asset/", "https://cdn.download.ams.birds.cornell.edu/api/v1/asset/")
 
         yield item
