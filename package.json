@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "scrape": "cd scrapers && make scrape",
     "start": "live-server --ignore=node_modules/** --no-css-inject --no-browser .",
     "test": "mocha"
   },
