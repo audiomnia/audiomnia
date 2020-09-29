@@ -115,17 +115,28 @@
 
       function renderMap(params) {
         mapDiv.innerHTML = "";
+
         var map = new ol.Map({
           layers: [
             new ol.layer.Tile({
-              source: new ol.source.TileWMS({
-                url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv',
-                params: {'LAYERS': 'GEBCO_LATEST', 'TILED': true},
-                serverType: 'geoserver',
-                // Countries have transparency, so do not fade tiles:
-                transition: 0
-              })
+              source: new ol.source.Stamen({
+                layer: 'terrain',
+              }),
             }),
+            new ol.layer.Tile({
+              source: new ol.source.Stamen({
+                layer: 'terrain-labels',
+              }),
+            }),
+            // new ol.layer.Tile({
+            //   source: new ol.source.TileWMS({
+            //     url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv',
+            //     params: {'LAYERS': 'GEBCO_LATEST', 'TILED': true},
+            //     serverType: 'geoserver',
+            //     // Countries have transparency, so do not fade tiles:
+            //     transition: 0
+            //   })
+            // }),
             new ol.layer.Vector({
               source: new ol.source.Vector({
                 format: new ol.format.GeoJSON({
