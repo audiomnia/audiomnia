@@ -7,8 +7,11 @@ venv: data
 	. venv/bin/activate; pip install -r requirements.txt
 
 scrape: venv
-	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=2000 --loglevel WARNING
+	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=10000 --loglevel WARNING
 
 clean:
 	rm -rf venv
 	find -iname "*.pyc" -delete
+
+clear-cache:
+	rm -rf .scrapy
