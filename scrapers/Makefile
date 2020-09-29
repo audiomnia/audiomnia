@@ -1,10 +1,12 @@
-setup:
+data:
 	mkdir -p data
+
+venv: data
 	python3 -m venv venv
 	. venv/bin/activate; pip install wheel
 	. venv/bin/activate; pip install -r requirements.txt
 
-scrape: setup
+scrape: venv
 	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=2000 --loglevel WARNING
 
 clean:
