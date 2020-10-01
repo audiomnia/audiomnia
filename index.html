@@ -116,6 +116,12 @@
       function renderMap(params) {
         mapDiv.innerHTML = "";
 
+        let view = new ol.View({
+          center: [0, 0],
+          zoom: 1,
+          maxZoom: 13
+        })
+
         var map = new ol.Map({
           layers: [
             new ol.layer.Tile({
@@ -169,10 +175,7 @@
             })
           ],
           target: document.getElementById('map'),
-          view: new ol.View({
-            center: [0, 0],
-            zoom: 1
-          })
+          view: view
         });
 
         map.addEventListener("click", function(e) {
