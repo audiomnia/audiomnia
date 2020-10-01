@@ -138,11 +138,33 @@
             //   })
             // }),
             new ol.layer.Vector({
-              source: new ol.source.Vector({
-                format: new ol.format.GeoJSON({
-                  featureProjection:"EPSG:3857"
-                }),
-                url: "./data/macaulaylibrary.geojson"
+              style: function (feature) {
+                return new ol.style.Style({
+                  image: new ol.style.Circle({
+                    radius: 8,
+                    stroke: new ol.style.Stroke({
+                      color: '#fff',
+                    }),
+                    fill: new ol.style.Fill({
+                      color: '#3399CC',
+                    }),
+                  }),
+                  // text: new Text({
+                  //   text: "12",
+                  //   fill: new ol.style.Fill({
+                  //     color: '#fff',
+                  //   }),
+                  // }),
+                });
+              },
+              source: new ol.source.Cluster({
+                distance: 50,
+                source: new ol.source.Vector({
+                  format: new ol.format.GeoJSON({
+                    featureProjection:"EPSG:3857"
+                  }),
+                  url: "./data/macaulaylibrary.geojson"
+                })
               })
             })
           ],
