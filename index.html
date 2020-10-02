@@ -144,27 +144,50 @@
             //   })
             // }),
             new ol.layer.Vector({
-              style: function (feature) {
-                return new ol.style.Style({
-                  image: new ol.style.Circle({
-                    radius: 8,
-                    stroke: new ol.style.Stroke({
-                      color: '#fff',
+              style: function (cluster) {
+                let style
+                let features = cluster.get('features') || []
+
+                // If it is a single feature, then show the pinkish circle for now.
+                // TODO: Migrate to images once we figure out the async style situation.
+                if(features.length > 1) {
+                  style = new ol.style.Style({
+                    image: new ol.style.Circle({
+                      radius: 17,
+                      stroke: new ol.style.Stroke({
+                        width: 2,
+                        color: '#fff'
+                      }),
+                      fill: new ol.style.Fill({ color: '#77CCC7' }),
                     }),
-                    fill: new ol.style.Fill({
-                      color: '#3399CC',
+                    text: new ol.style.Text({
+                      offsetY: 1,
+                      textAlign: 'center',
+                      font: '10px sans-serif',
+                      text: `${features.length}`,
+                      fill: new ol.style.Fill({
+                        color: '#000'
+                      }),
+                    })
+                  })
+                } else {
+                    style = new ol.style.Style({
+                    image: new ol.style.Circle({
+                      radius: 8,
+                      stroke: new ol.style.Stroke({
+                        color: '#fff',
+                      }),
+                      fill: new ol.style.Fill({
+                        color: '#D264FF',
+                      }),
                     }),
-                  }),
-                  // text: new Text({
-                  //   text: "12",
-                  //   fill: new ol.style.Fill({
-                  //     color: '#fff',
-                  //   }),
-                  // }),
-                });
+                  })
+                }
+
+                return style
               },
               source: new ol.source.Cluster({
-                distance: 50,
+                distance: 83,
                 source: new ol.source.Vector({
                   format: new ol.format.GeoJSON({
                     featureProjection:"EPSG:3857"
