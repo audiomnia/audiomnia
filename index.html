@@ -179,11 +179,29 @@
         });
 
         map.addEventListener("click", function(e) {
+          // Get all the features at the pixl of the mouse click.
           const features = this.getFeaturesAtPixel(e.pixel)
             .filter(f => !(f.type === "VECTOR"))
 
-          $("#results").html("");
-          Promise.all(features.map(renderResults));
+          // Start with an empty extent, and then loop through the features to grow
+          // the extent so that it contains the extent of all the sub-features in
+          // the cluster.
+          const extent = new ol.extent.createEmpty();
+          features[0].get('features').forEach(function(f, index, array){
+            ol.extent.extend(extent, f.getGeometry().getExtent());
+          });
+
+          // If the extent is minimal, meaning its top left is its bottom right, then
+          // render the UI below. TODO: Slow and rude at anything > 30 results. Don't be rude.
+          if(extent[0] === extent[2] || extent[1] === extent[3]) {
+            $("#results").html("");
+            // Render the cards below the map
+            Promise.all(features[0].get('features').map(renderResults));
+          } else {
+            // If there is an extent, "zoom" aka fit the view to the extent,
+            // and re-render the map features at the new zoom level.
+            view.fit(extent, { padding: [40, 60, 40, 60] });
+          }
         })
       }
 
