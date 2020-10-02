@@ -96,7 +96,7 @@
         const location = desc[4]
         const datetime = desc[5]
 
-        const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${name}`)
+        const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${sciName}`)
         const image = (await res.json()).results[0].default_photo.medium_url
 
         let template = `<div class="col-md-4 card">`
