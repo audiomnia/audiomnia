@@ -1,6 +1,8 @@
-venv
+scrapers/venv
 __pycache__
 *.jl
 *.pyc
 node_modules/
 scrapers/.scrapy
+.jekyll-cache/
+_site

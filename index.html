@@ -4,77 +4,72 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
-          crossorigin="anonymous">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css">
+    <link rel="stylesheet" href="./css/ol.css">
     <style>
-      .map { height: 400px; width: 100%; }
+      .map { height: 100%; width: 100%; position: fixed; }
       a { color: #517066; font-weight: bold; }
+
+      body, html { margin: 0; padding: 0; }
+      .ol-zoom { left: unset; right: 8px; top: 44px; }
+
+      #results {
+        opacity: 0;
+        position: absolute;
+        top: 76px;
+        left: 11vw;
+        background: white;
+        max-width: 39vw;
+        width: 312px;
+        max-height: 70vh;
+        overflow-y: scroll;
+        line-height: 12px;
+        min-width: 256px;
+        box-shadow: 2px 2px 9px #7d7c7c;
+      }
+
+      #results > dd > audio {
+        width: 100%;
+      }
+
+      /* Stripe the definition list terms and descriptions */
+      #results dt:nth-child(4n - 1),
+      #results dd:nth-child(4n) {
+        background-color: #eaeae9;
+      }
+
+      #results dt {
+        min-height: 75px; /* Same height as square thumbnail */
+      }
+
+      #results dd {
+        margin-left: unset;
+      }
+
+      cite {
+        display: block;
+        padding: 2px 2px 4px 2px;
+        font-size: 10px;
+        text-align: right;
+      }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js"></script>
+    <script src="./js/ol.js"></script>
     <script src="./js/querystring.min.js"></script>
 
-    <title>Audiomnia</title>
+    <title>Global Bioacoustics Map :: Audiomnia</title>
   </head>
   <body>
-    <div class="container">
-      <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="#">Audiomnia</a>
-        <button class="navbar-toggler" type="button"
-                data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    <div id="map" class="map"></div>
+    <dl id="results"></dl>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="?birds">
-                Birds<span class="sr-only">(current)</span>
-              </a>
-            </li>
-            <li class="nav-item disabled">
-              <a class="nav-link" href="?marine">
-                Marine <small>(coming soon)</small>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </nav>
+    <!-- TODO: Replace with attribution -->
+    <!-- <footer style="margin-top: 1em">
+      Source code available on <a href="https://github.com/hackforthesea/audiomnia">GitHub</a>.
+    </footer> -->
 
-      <!-- <div class="row">
-        <div class="col-md-12">
-          <form class="form-inline my-2 my-lg-2">
-            <input class="form-control mr-sm-2" id="search" type="search" placeholder="Filter by creator or species" aria-label="Filter by creator or species">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Filter</button>
-            &nbsp;<button class="btn btn-info">Linda Macaulay ×</button>
-            &nbsp;<button class="btn btn-warning">Malachite Sunbird <em>Nectarinia famosa</em> ×</button>
-          </form>
-        </div>
-      </div> -->
-
-      <div class="row">
-        <div class="col-md-12">
-          <div id="map" class="map"></div>
-        </div>
-      </div>
-
-      <div class="row" id="results"></div>
-
-      <footer style="margin-top: 1em">
-        Source code available on <a href="https://github.com/hackforthesea/audiomnia">GitHub</a>.
-      </footer>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     <script type="text/javascript">
+      const MAX_ZOOM = 13;
+
       var qs = querystring.parse();
       if(qs.hasOwnProperty('birds') && qs.hasOwnProperty('marine')) {
         window.location = "?birds"
@@ -85,56 +80,60 @@
       async function renderResults(feature) {
         const props = feature.getProperties()
 
-        const url = props.url
-        const img = props.image
-        const desc = props.description
-        const name = desc[1]
-        const sciName = desc[2]
-        const audio = props.audio
-        const libraryIdentifier = desc[0]
-        const copyright = desc[3]
-        const location = desc[4]
-        const datetime = desc[5]
+        const name = props.description[1]
+        const sciName = props.description[2]
 
         const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${sciName}`)
-        const image = (await res.json()).results[0].default_photo.medium_url
+        const results = (await res.json()).results[0]
+        const image = results ? results.default_photo.square_url : './img/default_bird.png';
 
-        let template = `<div class="col-md-4 card">`
-        template += `     <img class="card-img-top" src="${image}" alt="" />`
-        template += `     <div class="card-body">`
-        template += `       <div class="card-title"><a href="${url}">${name}<br /><small>(${sciName})</small></a></div>`
-        template += `       <audio controls><source src="${audio}"></audio>`
-        template += `       <div class="card-text">${libraryIdentifier}</div>`
-        template += `       <div class="card-text">${copyright}</div>`
-        template += `       <div class="card-text">${location}</div>`
-        template += `       <div class="card-text">${datetime}</div>`
-        template += `     </div>`
-        template += `   </div>`
+        const date = new Date(props.dateCreated).toDateString()
 
-        $('#results').append(template)
+        const img_tag = new Image()
+        img_tag.onload = function() {
+          let template = `<dt>`
+          template += `     <img style="max-width: 75px; float: left; margin: 4px" src="${image}" alt="" />`
+          template += `     <small style="font-size: 10px">${sciName}</small>`
+          template += `     <h5 style="margin: 4px 0">${name}</h5>`
+          template += `     <time style="font-size: 10px">${date}</time>`
+          // Keeping this here in case the contentLocation is needed hidden in the semantics
+          // template += `     <div style="font-size: 10px">${props.contentLocation}</div>`
+          template += `   </dt>`
+          template += `   <dd>`
+          template += `     <audio controls><source src="${props.audio}"></audio>`
+          template += `     <cite>`
+          template += `       ${props.creator}`
+          template += `       / Macaulay Library at the Cornell Lab`
+          template += `       (<a href="${props.url}">ML529861</a>)`
+          template += `     </cite>`
+          template += `   </dd>`
+
+          document.querySelector('#results').innerHTML += template
+        }
+        img_tag.src = image
       }
 
-      function renderMap(params) {
-        mapDiv.innerHTML = "";
+      const { View, Map, Overlay } = ol
+      const { Tile, Vector } = ol.layer;
+      const { Stamen, Cluster } = ol.source;
+      const { GeoJSON } = ol.format;
+      const { Style, Circle, Stroke, Fill, Text } = ol.style;
+      const { FullScreen } = ol.control
 
-        let view = new ol.View({
+      function renderMap() {
+        let view = new View({
           center: [0, 0],
           zoom: 1,
-          maxZoom: 13
+          maxZoom: MAX_ZOOM
         })
 
-        var map = new ol.Map({
+        let attribution
+
+        window.map = new Map({
+          controls: ol.control.defaults().extend([new FullScreen()]),
           layers: [
-            new ol.layer.Tile({
-              source: new ol.source.Stamen({
-                layer: 'terrain',
-              }),
-            }),
-            new ol.layer.Tile({
-              source: new ol.source.Stamen({
-                layer: 'terrain-labels',
-              }),
-            }),
+            new Tile({ preload: Infinity, source: new Stamen({ layer: 'terrain' }) }),
+            new Tile({ preload: Infinity, source: new Stamen({ layer: 'terrain-labels' }) }),
             // new ol.layer.Tile({
             //   source: new ol.source.TileWMS({
             //     url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv',
@@ -144,55 +143,46 @@
             //     transition: 0
             //   })
             // }),
-            new ol.layer.Vector({
+            new Vector({
               style: function (cluster) {
                 let style
                 let features = cluster.get('features') || []
+                const zoomLevel = map.getView().getZoom()
+                const isMaxZoom = zoomLevel === MAX_ZOOM
+
+                const locationText = isMaxZoom ? new Text({
+                  offsetX: 16,
+                  textAlign: 'left',
+                  font: '12px sans-serif',
+                  fontWeight: 'bold',
+                  text: `${features[0].getProperties().contentLocation}`,
+                  fill: new Fill({ color: '#000' }),
+                  stroke: new Stroke({ width: 5, color: '#fff' }),
+                }) : null
 
                 // If it is a single feature, then show the pinkish circle for now.
                 // TODO: Migrate to images once we figure out the async style situation.
-                if(features.length > 1) {
-                  style = new ol.style.Style({
-                    image: new ol.style.Circle({
-                      radius: 17,
-                      stroke: new ol.style.Stroke({
-                        width: 2,
-                        color: '#fff'
-                      }),
-                      fill: new ol.style.Fill({ color: '#77CCC7' }),
-                    }),
-                    text: new ol.style.Text({
-                      offsetY: 1,
-                      textAlign: 'center',
-                      font: '10px sans-serif',
-                      text: `${features.length}`,
-                      fill: new ol.style.Fill({
-                        color: '#000'
-                      }),
-                    })
+                style = new Style({
+                  image: new Circle({
+                    radius: 17,
+                    stroke: new Stroke({ width: 2, color: '#fff' }),
+                    fill: new Fill({ color: '#77CCC7' }),
+                  }),
+                  text: isMaxZoom ? locationText : new Text({
+                    offsetY: 1,
+                    textAlign: 'center',
+                    font: '10px sans-serif',
+                    text: `${features.length}`,
+                    fill: new Fill({ color: '#000' }),
                   })
-                } else {
-                    style = new ol.style.Style({
-                    image: new ol.style.Circle({
-                      radius: 8,
-                      stroke: new ol.style.Stroke({
-                        color: '#fff',
-                      }),
-                      fill: new ol.style.Fill({
-                        color: '#D264FF',
-                      }),
-                    }),
-                  })
-                }
+                })
 
                 return style
               },
-              source: new ol.source.Cluster({
+              source: new Cluster({
                 distance: 83,
                 source: new ol.source.Vector({
-                  format: new ol.format.GeoJSON({
-                    featureProjection:"EPSG:3857"
-                  }),
+                  format: new GeoJSON({ featureProjection:"EPSG:3857" }),
                   url: "./data/macaulaylibrary.geojson"
                 })
               })
@@ -202,10 +192,20 @@
           view: view
         });
 
+        map.on('moveend', (event) => {
+          const results = document.getElementById('results')
+          var map = event.map
+          if(map.getView().getZoom() < MAX_ZOOM) {
+            results.style.opacity = 0
+            results.innerHTML = ''
+          }
+        })
+
         map.addEventListener("click", function(e) {
           // Get all the features at the pixl of the mouse click.
           const features = this.getFeaturesAtPixel(e.pixel)
             .filter(f => !(f.type === "VECTOR"))
+          if (features.length === 0) return
 
           // Start with an empty extent, and then loop through the features to grow
           // the extent so that it contains the extent of all the sub-features in
@@ -218,13 +218,29 @@
           // If the extent is minimal, meaning its top left is its bottom right, then
           // render the UI below. TODO: Slow and rude at anything > 30 results. Don't be rude.
           if(extent[0] === extent[2] || extent[1] === extent[3]) {
-            $("#results").html("");
             // Render the cards below the map
-            Promise.all(features[0].get('features').map(renderResults));
+            // Promise.all(features[0].get('features').map(renderResults));
+            const goldenSmaller = window.innerWidth / 1.61803844258
+            const bottomOffset = window.innerHeight - 40
+            view.fit(extent, { duration: 500, padding: [40, goldenSmaller, bottomOffset, 0] });
+
+            // FIXME: For now only grab the first 10 features of any given cluster.
+            // FIXME: Either make all of these resolve OR switch to another Promise.all type
+            //        mechanism that handles rejections and continues
+            document.getElementById('results').innerHTML = ''
+
+            if(features[0].get('features').length > 10) {
+              document.getElementById('results').innerHTML =
+                '<div style="font-size: 12px; text-align: center; padding: 4px; background: lightyellow">Note: only the first 10 results shown</div>';
+            }
+            Promise.all(features[0].get('features').slice(0,10).map(renderResults)).then(() => {
+              document.getElementById('results').style.opacity = 1
+            })
           } else {
             // If there is an extent, "zoom" aka fit the view to the extent,
             // and re-render the map features at the new zoom level.
-            view.fit(extent, { padding: [40, 60, 40, 60] });
+            const bottomOffset = window.innerHeight / 4
+            view.fit(extent, { duration: 500, padding: [80, 60, bottomOffset, 60] });
           }
         })
       }
