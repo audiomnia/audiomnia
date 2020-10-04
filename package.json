@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "scrape": "cd scrapers && make scrape",
+    "scrapy-shell": "cd scrapers && . ./venv/bin/activate; scrapy shell",
     "start": "live-server --ignore=node_modules/** --no-css-inject --no-browser .",
     "test": "mocha"
   },
