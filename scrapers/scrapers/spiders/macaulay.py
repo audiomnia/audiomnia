@@ -21,13 +21,6 @@ class MacaulayLibrarySpider(scrapy.Spider):
     # Step 1:
     # Start the scraper by making a big array of all the urls from
     # start asset_id to max_asset_id, then concurrently requesting them
-
-    # TODO: Caching
-    # TODO: Error caching
-    #           - Bad description split
-    #           - 40X errors
-    #           - Unidentified
-    #           - No lat lon
     def start_requests(self):
         for asset_id in range(1, int(self.MAX) + 1):
             url = self.URL_TEMPLATE.format(asset_id)

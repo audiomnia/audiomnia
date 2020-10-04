@@ -22,10 +22,20 @@ class GeoJsonItemExporter(BaseItemExporter):
         self.file.write(b"\n]}")
 
     def export_item(self, item):
+        geojson = {}
+        # TODO: Validate media URLs here
+        # TODO: Backup geolocation by municipality
+        geojson["type"] = "Feature"
+        geojson["geometry"] = {
+            "type": "Point",
+            "coordinates": [item.pop('longitude'), item.pop('latitude')]
+        }
+        geojson["properties"] = item
+
         if self.first_item:
             self.first_item = False
         else:
             self.file.write(b',\n')
-        data = self.encoder.encode(item)
+        data = self.encoder.encode(geojson)
         self.file.write(to_bytes(data, self.encoding))
 
