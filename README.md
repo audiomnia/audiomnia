@@ -84,6 +84,10 @@ By default, HTTP Caching is enabled in the Scrapy config. This will deposit a LO
 of data in ./scrapers/scrapers/.scrapy. This will make your development much easier
 and your scraping much more polite.
 
+### Tests
+
+UI Tests using Mocha + Puppeteer are in the test/ folder.
+
 ## License
 
 [GPL-3.0](./LICENSE.md) © 2020 Audiomnia
