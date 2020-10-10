@@ -1,11 +1,13 @@
 {
   "name": "audiomnia",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
-  "main": "index.js",
+  "bin": {
+    "audiomnia": "./cli.js"
+  },
   "scripts": {
     "scrape": "cd scrapers && make scrape",
-    "start": "live-server --ignore=node_modules/** --no-css-inject --no-browser .",
+    "start": "./cli.js",
     "test": "mocha"
   },
   "repository": {
@@ -20,6 +22,10 @@
   },
   "homepage": "https://audiomnia.com",
   "devDependencies": {
-    "mocha": "^8.1.3"
+    "mocha": "^8.1.3",
+    "puppeteer": "^5.3.1"
+  },
+  "dependencies": {
+    "live-server": "^1.2.1"
   }
 }
