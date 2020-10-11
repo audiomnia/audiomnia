@@ -85,7 +85,7 @@
 
         const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${sciName}`)
         const results = (await res.json()).results[0]
-        const image = results.default_photo ? results.default_photo.square_url : './img/default_bird.png';
+        const image =  (results && results.default_photo) ? results.default_photo.square_url : './img/default_bird.png';
 
         const date = new Date(props.dateCreated).toDateString()
 
