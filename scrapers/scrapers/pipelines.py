@@ -29,8 +29,16 @@ class GeoJSONPipeline(object):
             "type": "Point",
             "coordinates": [longitude, latitude]
         }
+
+        # FIXME: Clean this up
+        item.pop("@context")
+        item.pop("@type")
+        item.pop("name")
+        item.pop("image")
+        item.pop("fileFormat")
+
         geojson["properties"] = item
-        geojson["properties"]["description"] = description_split
+        geojson["properties"]["description"] = description_split[1:3]
 
         self.exporter.export_item(geojson)
 

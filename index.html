@@ -80,8 +80,8 @@
       async function renderResults(feature) {
         const props = feature.getProperties()
 
-        const name = props.description[1]
-        const sciName = props.description[2]
+        const name = props.description[0]
+        const sciName = props.description[1]
 
         const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${sciName}`)
         const results = (await res.json()).results[0]

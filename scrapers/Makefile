@@ -4,7 +4,7 @@ venv:
 	. venv/bin/activate; pip install -r requirements.txt
 
 scrape: venv
-	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=50000 --loglevel WARNING
+	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=75000 --loglevel WARNING
 
 clean:
 	rm -rf venv
