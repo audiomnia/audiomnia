@@ -90,6 +90,7 @@
         const image =  (results && results.default_photo) ? results.default_photo.square_url : './img/default_bird.png';
 
         const date = new Date(props.dateCreated).toDateString()
+        const assetId = props.url.split('/')[props.url.split('/').length - 1]
 
         const img_tag = new Image()
         img_tag.onload = function() {
@@ -106,7 +107,7 @@
           template += `     <cite>`
           template += `       ${props.creator}`
           template += `       / Macaulay Library at the Cornell Lab`
-          template += `       (<a href="${props.url}">ML529861</a>)`
+          template += `       (<a href="${props.url}">ML${assetId}</a>)`
           template += `     </cite>`
           template += `   </dd>`
 
