@@ -4,6 +4,7 @@ const puppeteer = require('puppeteer')
 
 describe('Rendering and layout', function () {
   let audiomnia, browser, page
+  this.timeout(5000)
 
   before(async () => {
     audiomnia = spawn('./cli.js')
@@ -24,12 +25,16 @@ describe('Rendering and layout', function () {
   })
 
   it('results list starts off invisible and minimized', async () => {
-    const result = await page.$eval('#results', elem => {
-      return [parseInt(elem.style.opacity, 10), elem.offsetHeight]
+    const offsetHeight = await page.$eval('#results', elem => {
+      return elem.offsetHeight
     })
 
-    assert.strictEqual(result[0], 0)
-    assert.strictEqual(result[1], 0)
+    const opacity = await page.$eval('#results', elem => {
+      return elem.style.opacity
+    })
+
+    assert.strictEqual(opacity, '0')
+    assert.strictEqual(offsetHeight, 0)
   })
 
   after(async () => {
