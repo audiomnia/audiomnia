@@ -4,7 +4,8 @@ venv:
 	. venv/bin/activate; pip install -r requirements.txt
 
 scrape: venv
-	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=75000 --loglevel WARNING
+	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=150000 --loglevel WARNING
+	gzip ../data/macaulaylibrary.geojson
 
 clean:
 	rm -rf venv

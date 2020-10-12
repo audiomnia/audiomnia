@@ -55,6 +55,8 @@
 
     <script src="./js/ol.js"></script>
     <script src="./js/querystring.min.js"></script>
+    <script src="./js/pako_inflate.min.js"></script>
+
 
     <title>Global Bioacoustics Map :: Audiomnia</title>
   </head>
@@ -143,7 +145,31 @@
             //     transition: 0
             //   })
             // }),
-            new Vector({
+          ],
+          target: document.getElementById('map'),
+          view: view
+        });
+
+        fetch('./data/macaulaylibrary.geojson.gz')
+          .then((resp) => resp.arrayBuffer())
+          .then((data) => {
+            const inflated = pako.inflate(data)
+            const decoded = new TextDecoder("utf-8").decode(inflated);
+            const geojson = JSON.parse(decoded)
+
+            const vectorSource = new ol.source.Vector({
+              features: (new GeoJSON()).readFeatures(geojson, {
+                featureProjection: 'EPSG:3857'
+              })
+            })
+
+            const clusterSource = new Cluster({
+              distance: 83,
+              source: vectorSource
+            })
+
+            const vectorLayer = new Vector({
+              source: clusterSource,
               style: function (cluster) {
                 let style
                 let features = cluster.get('features') || []
@@ -178,19 +204,11 @@
                 })
 
                 return style
-              },
-              source: new Cluster({
-                distance: 83,
-                source: new ol.source.Vector({
-                  format: new GeoJSON({ featureProjection:"EPSG:3857" }),
-                  url: "./data/macaulaylibrary.geojson"
-                })
-              })
+              }
             })
-          ],
-          target: document.getElementById('map'),
-          view: view
-        });
+
+            map.addLayer(vectorLayer)
+          })
 
         map.on('moveend', (event) => {
           const results = document.getElementById('results')
