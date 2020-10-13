@@ -1,0 +1,50 @@
+.map {
+  height: 100%;
+  position: fixed;
+  width: 100%;
+}
+
+a { color: #517066; font-weight: bold; }
+
+body, html { margin: 0; padding: 0; }
+.ol-zoom { left: unset; right: 8px; top: 44px; }
+
+.results {
+  background: white;
+  box-shadow: 2px 2px 9px #7d7c7c;
+  left: 11vw;
+  line-height: 12px;
+  max-height: 70vh;
+  max-width: 39vw;
+  min-width: 256px;
+  opacity: 0;
+  overflow-y: scroll;
+  position: absolute;
+  top: 76px;
+  width: 312px;
+}
+
+.results > dd > audio {
+  width: 100%;
+}
+
+/* Stripe the definition list terms and descriptions */
+.results dt:nth-child(4n - 1),
+.results dd:nth-child(4n) {
+  background-color: #eaeae9;
+}
+
+.results dt {
+  min-height: 75px; /* Same height as square thumbnail */
+}
+
+.results dd {
+  margin-left: unset;
+}
+
+cite {
+  display: block;
+  font-size: 10px;
+  padding: 2px 2px 4px 2px;
+  text-align: right;
+}
