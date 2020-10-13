@@ -53,23 +53,23 @@
       }
     </style>
 
-    <script src="./js/ol.js"></script>
-    <script src="./js/querystring.min.js"></script>
-    <script src="./js/pako_inflate.min.js"></script>
+    <script src="./vendor/ol.js"></script>
+    <script src="./vendor/querystring.min.js"></script>
+    <script src="./vendor/pako_inflate.min.js"></script>
 
 
     <title>Global Bioacoustics Map :: Audiomnia</title>
   </head>
   <body>
-    <div id="map" class="map"></div>
-    <dl id="results"></dl>
+    <div id="map" class="map" />
+    <dl id="results" />
 
     <!-- TODO: Replace with attribution -->
     <!-- <footer style="margin-top: 1em">
       Source code available on <a href="https://github.com/hackforthesea/audiomnia">GitHub</a>.
     </footer> -->
 
-    <script type="text/javascript">
+    <script>
       const MAX_ZOOM = 13;
 
       var qs = querystring.parse();
