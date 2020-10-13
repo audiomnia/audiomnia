@@ -25,6 +25,8 @@ describe('Rendering and layout', function () {
   })
 
   it('results list starts off invisible and minimized', async () => {
+    await page.waitForSelector('#results')
+
     const offsetHeight = await page.$eval('#results', elem => {
       return elem.offsetHeight
     })
