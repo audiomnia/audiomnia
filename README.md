@@ -2,6 +2,7 @@
 > A global bioacoustics map
 
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![audiomnia](https://circleci.com/gh/audiomnia/audiomnia.svg?style=svg)](https://app.circleci.com/pipelines/github/audiomnia/audiomnia?branch=master)
 
 Data provided by the
 [The Macaulay Library at the Cornell Lab of Ornithology](https://macaulaylibrary.org/)
