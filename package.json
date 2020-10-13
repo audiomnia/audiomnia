@@ -6,7 +6,7 @@
     "audiomnia": "./cli.js"
   },
   "scripts": {
-    "scrape": "cd scrapers && make scrape",
+    "scrape": "make scrape",
     "start": "./cli.js",
     "test": "mocha"
   },

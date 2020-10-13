@@ -5,7 +5,7 @@ venv:
 
 scrape: venv
 	. venv/bin/activate; scrapy crawl macaulaylibrary -a MAX=150000 --loglevel WARNING
-	gzip ../data/macaulaylibrary.geojson
+	gzip ./data/macaulaylibrary.geojson
 
 clean:
 	rm -rf venv

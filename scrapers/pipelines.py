@@ -5,7 +5,7 @@ from scrapers.exporters import GeoJsonItemExporter
 
 class GeoJSONPipeline(object):
     def open_spider(self, spider):
-        file_path = '../data/{}.geojson'.format(spider.name)
+        file_path = './data/{}.geojson'.format(spider.name)
         self.file = open(file_path, 'wb')
         self.exporter = GeoJsonItemExporter(self.file)
         self.exporter.start_exporting()
