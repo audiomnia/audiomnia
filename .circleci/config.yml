@@ -3,7 +3,22 @@ orbs:
   node: circleci/node@3.0.0
 
 jobs:
-  linting:
+  linting-html:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run: git clone https://github.com/audiomnia/audiomnia
+      - run:
+          command: git checkout $CIRCLE_BRANCH
+          working_directory: ./audiomnia
+      - run:
+          command: |
+            source ~/.bashrc
+            nvm install 12
+            python -m SimpleHTTPServer &
+            npx html-lint localhost:8080
+          working_directory: ./audiomnia
+  linting-js:
     machine:
       image: ubuntu-1604:201903-01
     steps:
@@ -36,5 +51,9 @@ jobs:
 workflows:
   test:
     jobs:
-      - linting
-      - test-ui
+      - linting-js
+      - linting-html
+      - test-ui:
+          requires:
+            - linting-js
+            - linting-html
