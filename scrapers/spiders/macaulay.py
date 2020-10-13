@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-from lxml import etree, html
-import os
-import sys
 
 import scrapy
 
@@ -38,12 +35,15 @@ class MacaulayLibrarySpider(scrapy.Spider):
     # untested derivation of the media URL.
     def parse_media_page(self, response):
         try:
-            json_ld = response.css("script[type='application/ld+json']::text").get()
+            selector = "script[type='application/ld+json']::text"
+            json_ld = response.css(selector).get()
             if json_ld is None:
                 yield None
             else:
                 item = json.loads(json_ld)
-                item["audio"] = item["url"].replace("https://macaulaylibrary.org/asset/", "https://cdn.download.ams.birds.cornell.edu/api/v1/asset/")
+                oldurl = "macaulaylibrary.org/asset"
+                newurl = "cdn.download.ams.birds.cornell.edu/api/v1/asset"
+                item["audio"] = item["url"].replace(oldurl, newurl)
 
                 yield item
         except Exception as err:

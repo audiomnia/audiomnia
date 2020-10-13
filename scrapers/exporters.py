@@ -6,8 +6,8 @@ from scrapy.exporters import BaseItemExporter
 from scrapy.utils.serialize import ScrapyJSONEncoder
 from scrapy.utils.python import to_bytes
 
-class GeoJsonItemExporter(BaseItemExporter):
 
+class GeoJsonItemExporter(BaseItemExporter):
     def __init__(self, file, **kwargs):
         self._configure(kwargs, dont_fail=True)
         self.file = file
@@ -28,4 +28,3 @@ class GeoJsonItemExporter(BaseItemExporter):
             self.file.write(b',\n')
         data = self.encoder.encode(item)
         self.file.write(to_bytes(data, self.encoding))
-
