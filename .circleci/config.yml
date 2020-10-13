@@ -3,6 +3,20 @@ orbs:
   node: circleci/node@3.0.0
 
 jobs:
+  linting:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - run: git clone https://github.com/audiomnia/audiomnia
+      - run:
+          command: git checkout $CIRCLE_BRANCH
+          working_directory: ./audiomnia
+      - run:
+          command: |
+            source ~/.bashrc
+            nvm install 12
+            npx standard
+          working_directory: ./audiomnia
   test-ui:
     machine:
       image: ubuntu-1604:201903-01
@@ -22,4 +36,5 @@ jobs:
 workflows:
   test:
     jobs:
+      - linting
       - test-ui
