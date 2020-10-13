@@ -22,6 +22,7 @@ body, html { margin: 0; padding: 0; }
   position: absolute;
   top: 76px;
   width: 312px;
+  z-index: 999;
 }
 
 .results > dd > audio {
