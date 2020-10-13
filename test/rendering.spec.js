@@ -38,7 +38,7 @@ describe('Rendering and layout', function () {
   })
 
   after(async () => {
-    await browser.close();
+    await browser.close()
     audiomnia.kill()
   })
 })
