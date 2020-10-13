@@ -96,13 +96,19 @@ function renderMap () {
           const features = cluster.get('features') || []
           const zoomLevel = map.getView().getZoom()
           const isMaxZoom = zoomLevel === MAX_ZOOM
+          const geometry = features[0].getGeometry()
+          const props = features[0].getProperties()
+
+          const coords = ol.proj.toLonLat(geometry.getCoordinates())
+          const text = props.contentLocation !== ''
+            ? props.contentLocation : `${coords[1].toFixed(4)}, ${coords[0].toFixed(4)}`
 
           const locationText = isMaxZoom ? new Text({
             offsetX: 16,
             textAlign: 'left',
             font: '12px sans-serif',
             fontWeight: 'bold',
-            text: `${features[0].getProperties().contentLocation}`,
+            text: text,
             fill: new Fill({ color: '#000' }),
             stroke: new Stroke({ width: 5, color: '#fff' })
           }) : null
