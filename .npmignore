@@ -2,3 +2,4 @@ scrapers
 _site
 .github/FUNDING.yml
 .circleci/config.yml
+CNAME
