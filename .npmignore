@@ -4,3 +4,8 @@ _site
 .circleci/config.yml
 CNAME
 test
+.github
+.scrapy
+venv
+Makefile
+scrapy.cfg
