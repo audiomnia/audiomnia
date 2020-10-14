@@ -4,8 +4,8 @@ orbs:
 
 jobs:
   lint-css:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: cimg/node:lts
     steps:
       - run: git clone https://github.com/audiomnia/audiomnia
       - run:
@@ -13,13 +13,11 @@ jobs:
           working_directory: ./audiomnia
       - run:
           command: |
-            source ~/.bashrc
-            nvm install 12
             npx csslint css
           working_directory: ./audiomnia
   lint-html:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: cimg/python:3.8-node
     steps:
       - run: git clone https://github.com/audiomnia/audiomnia
       - run:
@@ -27,14 +25,13 @@ jobs:
           working_directory: ./audiomnia
       - run:
           command: |
-            source ~/.bashrc
-            nvm install 12
-            python -m SimpleHTTPServer &
+            python -m http.server &
+            npm install phantomjs-prebuilt
             npx html-lint localhost:8080
           working_directory: ./audiomnia
   lint-js:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: cimg/node:lts
     steps:
       - run: git clone https://github.com/audiomnia/audiomnia
       - run:
@@ -42,8 +39,6 @@ jobs:
           working_directory: ./audiomnia
       - run:
           command: |
-            source ~/.bashrc
-            nvm install 12
             npx standard
           working_directory: ./audiomnia
   lint-python:
@@ -56,13 +51,12 @@ jobs:
           working_directory: ./audiomnia
       - run:
           command: |
-            source ~/.bashrc
             make venv
             . venv/bin/activate; flake8 scrapers
           working_directory: ./audiomnia
   test-ui:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: circleci/node:12-browsers
     steps:
       - run: git clone https://github.com/audiomnia/audiomnia
       - run:
@@ -70,8 +64,6 @@ jobs:
           working_directory: ./audiomnia
       - run:
           command: |
-            source ~/.bashrc
-            nvm install 12
             npm install
             npm test
           working_directory: ./audiomnia
