@@ -3,7 +3,7 @@ orbs:
   node: circleci/node@3.0.0
 
 jobs:
-  linting-css:
+  lint-css:
     machine:
       image: ubuntu-1604:201903-01
     steps:
@@ -17,7 +17,7 @@ jobs:
             nvm install 12
             npx csslint css
           working_directory: ./audiomnia
-  linting-html:
+  lint-html:
     machine:
       image: ubuntu-1604:201903-01
     steps:
@@ -32,7 +32,7 @@ jobs:
             python -m SimpleHTTPServer &
             npx html-lint localhost:8080
           working_directory: ./audiomnia
-  linting-js:
+  lint-js:
     machine:
       image: ubuntu-1604:201903-01
     steps:
@@ -45,6 +45,20 @@ jobs:
             source ~/.bashrc
             nvm install 12
             npx standard
+          working_directory: ./audiomnia
+  lint-python:
+    docker:
+      - image:  cimg/python:3.8
+    steps:
+      - run: git clone https://github.com/audiomnia/audiomnia
+      - run:
+          command: git checkout $CIRCLE_BRANCH
+          working_directory: ./audiomnia
+      - run:
+          command: |
+            source ~/.bashrc
+            make venv
+            . venv/bin/activate; flake8 scrapers
           working_directory: ./audiomnia
   test-ui:
     machine:
@@ -65,11 +79,13 @@ jobs:
 workflows:
   test:
     jobs:
-      - linting-css
-      - linting-js
-      - linting-html
+      - lint-css
+      - lint-js
+      - lint-html
+      - lint-python
       - test-ui:
           requires:
-            - linting-css
-            - linting-js
-            - linting-html
+            - lint-css
+            - lint-js
+            - lint-html
+            - lint-python
